@@ -35,7 +35,7 @@ our $VERSION = '0.02';
 			my $cache_id_seed =
 			$data->[0]->{default_key} || $cache_opt{$pkg}->{default_key} || '';
 			my $cache_id = *{$sym}. "\t". $cache_id_seed;
-			if ($cache_opt{$pkg}->{avoid_share_cache_in_process}) {
+			if ($cache_opt{$pkg}->{number_cache_id}) {
 				$cache_id .= "\t" . ($fnames{*{$sym}}++);
 			}
 			
@@ -71,11 +71,6 @@ our $VERSION = '0.02';
 	sub file_cache_purge {
 		
 	}
-	
-	sub debugPrint {
-		my $dump = Dumper($_[0]); $dump =~ s/\\x{([0-9a-z]+)}/chr(hex($1))/ge;
-		return $dump;
-	}
 
 package Class::FileCacheable::_CF;
 use strict;
@@ -88,15 +83,6 @@ use base qw(Cache::FileCache);
 		my ($self, $id) = @_;
 		return
 			(stat $self->{_Backend}->_path_to_key($self->{_Namespace}, $id))[9];
-	}
-	
-	### --------------
-	### デバッグ出力
-	### --------------
-	sub debugPrint {
-		
-		my $dump = Dumper($_[0]); $dump =~ s/\\x{([0-9a-z]+)}/chr(hex($1))/ge;
-		return $dump;
 	}
 
 1;
@@ -112,10 +98,10 @@ Class::FileCacheable - DEVELOPING
     use base 'Class::FileCacheable';
 	
 	sub file_cache_expire {
-		if ($to_old) {
+		my ($self, $timestamp) = @_;
+		if (some_condifion) {
 			return 1;
 		}
-		return;
 	}
 	
 	sub file_cache_options {
@@ -128,20 +114,113 @@ Class::FileCacheable - DEVELOPING
 	
 	sub some_sub1 : FileCacheable {
 		
+		my $self = shift;
 	}
 	
 	sub some_sub2 : FileCacheable(\&expire_code_ref) {
 		
+		my $self = shift;
 	}
 
 =head1 DESCRIPTION
 
-This module defines a attribute "FileCacheable" which redefines your functions
-cacheable.
+This module defines an attribute "FileCacheable" which redefines your functions
+cacheable. This module depends on L<Cache::FileCache> for managing cache files.
+
+To use this, do following steps.
+
+=item use base 'Class::FileCacheable';
+
+=item override the method I<file_cache_expire>
+
+=item override the method I<file_cache_option>
+
+=item define your subs as follows
+
+	sub your_sub : FileCacheable {
+		my $self = shift;
+		# do something
+	}
+
+That's it.
 
 =head1 METHODS
 
-=head2 new
+=head2 file_cache_expire
+
+This is a callback method for specifying the condition for cache expiretion.
+Your module can override the method if necessary.
+
+file_cache_exipre will be called as instance method when the target method
+called. This method takes timestamp of the cache as argument.
+
+	sub file_cache_expire {
+		my ($self, $timestamp) = @_;
+		if (some_condifion) {
+			return 1;
+		}
+	}
+
+file_cache_exipre should return 1 or 0. 1 causes the cache *EXPIRED*
+
+=head2 file_cache_options
+
+This is a callback method for specifying L<Cache::FileCache> options. Your
+module can override the method if necessary.
+
+    sub file_cache_options {
+        return {
+            'namespace' => 'Test',
+            'cache_root' => 't/cache',
+        };
+    }
+
+In addition to L<Cache::FileCache> options, you can set extra options bellow
+
+=item number_cache_id
+
+This takes 1 or 0 for value. '1' causes the cache ids automatically numbered so
+the caches doesn't affect in single process. This is useful if you want to
+cache the function calls as a sequence.
+
+=head2 file_cache_purge
+
+Not implemented yet
+
+=head1 EXAMPLE
+
+    package GetExampleDotCom;
+    use strict;
+    use warnings;
+    use base 'Class::FileCacheable';
+    use LWP::Simple;
+    
+        sub new {
+            return bless {}, shift;
+        }
+        
+        sub get : FileCacheable {
+            my $self = shift;
+            return get("http://example.com/");
+        }
+    
+        sub file_cache_expire {
+            my ($self, $timestamp) = @_;
+            if (time() - $timestamp > 86400) {
+                return 1;
+            }
+        }
+        
+        sub file_cache_options {
+            return {
+                'namespace' => 'GetRemoteFile',
+                'cache_root' => './cache',
+            };
+        }
+
+=head1 SEE ALSO
+
+L<Cache::FileCache>
 
 =head1 AUTHOR
 
