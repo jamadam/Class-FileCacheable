@@ -8,11 +8,14 @@ use TestModule;
 use TestModule2;
 use TestModule3;
 use TestModule4;
+use TestModule5;
 use File::Path;
     
     my $cache_namespace_base = 't/cache/Test';
     
     __PACKAGE__->runtests;
+    
+=unsupported
     
     sub basic1 : Test(2) {
         
@@ -36,6 +39,7 @@ use File::Path;
         }
         is(TestModule2::sub1('test2'), 'test2');
     }
+=cut
     
     sub oop_basic : Test(10) {
         
@@ -89,8 +93,22 @@ use File::Path;
         }
         
         my $a = TestModule4->new();
-        is($a->sub2('sub2-1'), 'sub2-1');
-        is($a->sub2('sub2-2'), 'sub2-2');
+        is($a->sub2('sub2-1'), 'sub2-1'); # must be cached
+        is($a->sub2('sub2-2'), 'sub2-2'); # must be cached
+    }
+    
+    sub oop_subclass_basic : Test(6) {
+        
+        if (-d $cache_namespace_base) {
+            rmtree($cache_namespace_base);
+        }
+        
+        is(TestModule5sub->file_cache_expire_called, undef);
+        is(TestModule5sub->get_file_cache_options_called, undef);
+        is(TestModule5sub->sub1('TestModule5sub'), 'TestModule5sub'); # must be cached
+        is(TestModule5sub->get_file_cache_options_called, 1);
+        is(TestModule5sub->sub1('TestModule5sub-2'), 'TestModule5sub');
+        is(TestModule5sub->file_cache_expire_called, 1);
     }
     
     END {

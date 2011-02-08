@@ -27,7 +27,8 @@ our $VERSION = '0.02';
 		no warnings 'redefine';
 		
 		*{$sym} = sub {
-			$cache_opt{$pkg} ||= $pkg->file_cache_options;
+			my $self = shift;
+			$cache_opt{$pkg} ||= $self->file_cache_options;
 			$cf_obj{$pkg} ||=
 				new Class::FileCacheable::_CF($cache_opt{$pkg});
 			my $cache_id_seed =
@@ -46,7 +47,7 @@ our $VERSION = '0.02';
 					if (! $data->[0]->{expire_ref}->($cache_tp)) {
 						$output = $cf_obj{$pkg}->get($cache_id);
 					}
-				} elsif (! $pkg->file_cache_expire($cache_tp)) {
+				} elsif (! $self->file_cache_expire($cache_tp)) {
 					$output = $cf_obj{$pkg}->get($cache_id);
 				}
 			}
@@ -54,7 +55,8 @@ our $VERSION = '0.02';
 			### generate cache
 			if (! defined($output)) {
 				no strict 'refs';
-				$output = $ref->(@_);
+				#$output = $ref->(@_);
+				$output = $self->$ref(@_);
 				$cf_obj{$pkg}->set($cache_id, $output);
 			}
 			
