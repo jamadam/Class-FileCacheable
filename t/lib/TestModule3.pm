@@ -1,7 +1,7 @@
 package TestModule3;
 use strict;
 use warnings;
-use base 'Attribute::FileCacheable';
+use base 'Class::FileCacheable';
 
     sub new {
         return bless {}, shift;

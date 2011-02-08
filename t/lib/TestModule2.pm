@@ -1,7 +1,7 @@
 package TestModule2;
 use strict;
 use warnings;
-use base 'Attribute::FileCacheable';
+use base 'Class::FileCacheable';
 
     sub sub1 : FileCacheable {
         return shift;

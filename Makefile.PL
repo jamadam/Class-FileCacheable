@@ -3,17 +3,16 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %params = (
-    NAME          => 'Attribute::FileCacheable',
+    NAME          => 'Class::FileCacheable',
     AUTHOR        => 'Sugama Keita <sugama@jamadam.com>',
-    VERSION_FROM  => 'lib/Attribute/FileCacheable.pm',
-    ABSTRACT_FROM => 'lib/Attribute/FileCacheable.pm',
+    VERSION_FROM  => 'lib/Class/FileCacheable.pm',
+    ABSTRACT_FROM => 'lib/Class/FileCacheable.pm',
     LICENSE       => 'perl',
     PREREQ_PM     => {
     },
     BUILD_REQUIRES => {
         'Test::More'          => '0.47',
         'Test::UseAllModules' => '0.10',
-        'Cache::Cache'        => '1.06',
     },
     META_MERGE => {
         resources => {
