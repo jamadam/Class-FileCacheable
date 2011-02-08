@@ -1,4 +1,4 @@
-package TestModule;
+package TestModule2;
 use strict;
 use warnings;
 use base 'Attribute::FileCacheable';
@@ -19,6 +19,7 @@ use base 'Attribute::FileCacheable';
 		return {
 			'namespace' => 'Test',
 			'cache_root' => 't/cache',
+			'avoid_share_cache_in_process' => 1,
 		};
 	}
 

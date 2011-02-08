@@ -31,7 +31,3 @@ t/99_podcoverage.t
 t/basic.t
 t/cache/MyNamespace/c/b/8/cb84c53f734345f0e18545c88f36c782d9274e1f
 t/lib/TestModule.pm
-t/lib/TestModule2.pm
-t/lib/TestModule3.pm
-t/lib/TestModule4.pm
-t/lib/TestModule5.pm
