@@ -22,7 +22,8 @@ our $VERSION = '0.02';
 	### ---
 	sub FileCacheable : ATTR(CHECK) {
 		
-		my($pkg, $sym, $ref, $attr, $data, $phase) = @_;
+		#my($pkg, $sym, $ref, $attr, $data, $phase) = @_;
+		my($pkg, $sym, $ref, undef, $data, undef) = @_;
 		
 		no warnings 'redefine';
 		
@@ -33,7 +34,7 @@ our $VERSION = '0.02';
 				new Class::FileCacheable::_CF($cache_opt{$pkg});
 			my $cache_id_seed =
 			$data->[0]->{default_key} || $cache_opt{$pkg}->{default_key} || '';
-			my $cache_id = join("\t", *{$sym}, $cache_id_seed);
+			my $cache_id = *{$sym}. "\t". $cache_id_seed;
 			if ($cache_opt{$pkg}->{avoid_share_cache_in_process}) {
 				$cache_id .= "\t" . ($fnames{*{$sym}}++);
 			}
@@ -55,7 +56,6 @@ our $VERSION = '0.02';
 			### generate cache
 			if (! defined($output)) {
 				no strict 'refs';
-				#$output = $ref->(@_);
 				$output = $self->$ref(@_);
 				$cf_obj{$pkg}->set($cache_id, $output);
 			}
