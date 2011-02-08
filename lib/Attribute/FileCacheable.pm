@@ -6,9 +6,6 @@ use Data::Dumper;
 use 5.005;
 our $VERSION = '0.02';
 	
-	### ---
-	### Cachable attribute
-	### ---
 	my %fnames;
 	my %cf_obj;
 	my %cache_opt;
@@ -33,14 +30,14 @@ our $VERSION = '0.02';
 			$cache_opt{$pkg} ||= $pkg->file_cache_options;
 			$cf_obj{$pkg} ||=
 				new Attribute::FileCacheable::_CF($cache_opt{$pkg});
-			my $cache_id =
-			join("\t", *{$sym}, 
-			$data->[0]->{default_key} || $cache_opt{$pkg}->{default_key} || '');
+			my $cache_id_seed =
+			$data->[0]->{default_key} || $cache_opt{$pkg}->{default_key} || '';
+			my $cache_id = join("\t", *{$sym}, $cache_id_seed);
 			if ($cache_opt{$pkg}->{avoid_share_cache_in_process}) {
 				$cache_id .= "\t" . ($fnames{*{$sym}}++);
 			}
-			my $output;
 			
+			my $output;
 			my $cache_tp = $cf_obj{$pkg}->get_cache_timestamp($cache_id);
 			
 			### check expire

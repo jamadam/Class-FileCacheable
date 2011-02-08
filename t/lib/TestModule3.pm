@@ -1,26 +1,34 @@
-package TestModule2;
+package TestModule3;
 use strict;
 use warnings;
 use base 'Attribute::FileCacheable';
 
-	sub sub1 : FileCacheable {
-		
-		my $arg = shift;
-		return $arg;
-	}
-	
-	sub file_cache_expire {
-		
-		return 0;
-	}
-	
-	sub file_cache_options {
-		
-		return {
-			'namespace' => 'TestModule2',
-			'cache_root' => 't/cache',
-			'avoid_share_cache_in_process' => 0,
-		};
-	}
+    sub new {
+        return bless {}, shift;
+    }
+    
+    sub sub1 : FileCacheable {
+        my $class = shift;
+        return shift;
+    }
+
+    sub get_class : FileCacheable {
+        return shift;
+    }
+
+    sub get_instance : FileCacheable {
+        return shift;
+    }
+    
+    sub file_cache_expire {
+        return 0;
+    }
+    
+    sub file_cache_options {
+        return {
+            'namespace' => 'Test',
+            'cache_root' => 't/cache',
+        };
+    }
 
 1;
