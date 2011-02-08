@@ -1,27 +1,5 @@
 Changes
 lib/Attribute/FileCacheable.pm
-lib/Attribute/FileCacheable~.pm
-lib/Cache/BaseCache.pm
-lib/Cache/BaseCacheTester.pm
-lib/Cache/Cache.pm
-lib/Cache/CacheMetaData.pm
-lib/Cache/CacheSizer.pm
-lib/Cache/CacheTester.pm
-lib/Cache/CacheUtils.pm
-lib/Cache/FileBackend.pm
-lib/Cache/FileCache.pm
-lib/Cache/MemoryBackend.pm
-lib/Cache/MemoryCache.pm
-lib/Cache/NullCache.pm
-lib/Cache/Object.pm
-lib/Cache/SharedMemoryBackend.pm
-lib/Cache/SharedMemoryCache.pm
-lib/Cache/SizeAwareCache.pm
-lib/Cache/SizeAwareCacheTester.pm
-lib/Cache/SizeAwareFileCache.pm
-lib/Cache/SizeAwareMemoryCache.pm
-lib/Cache/SizeAwareSharedMemoryCache.pm
-lib/t/lib/TestModule2.pm.pm
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -29,7 +7,6 @@ t/00_load.t
 t/99_pod.t
 t/99_podcoverage.t
 t/basic.t
-t/cache/MyNamespace/c/b/8/cb84c53f734345f0e18545c88f36c782d9274e1f
 t/lib/TestModule.pm
 t/lib/TestModule2.pm
 t/lib/TestModule3.pm
