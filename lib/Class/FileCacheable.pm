@@ -4,86 +4,82 @@ use warnings;
 use Attribute::Handlers;
 use Data::Dumper;
 use 5.005;
-our $VERSION = '0.02';
-	
-	my %fnames;
-	my %cf_obj;
-	my %cache_opt;
-	
-	### ---
-	### return true if cache *EXPIRED*
-	### ---
-	sub file_cache_expire {
-		return 0;
-	}
-	
-	### ---
-	### Define FileCacheable attribute
-	### ---
-	sub FileCacheable : ATTR(CHECK) {
-		
-		#my($pkg, $sym, $ref, $attr, $data, $phase) = @_;
-		my($pkg, $sym, $ref, undef, $data, undef) = @_;
-		
-		no warnings 'redefine';
-		
-		*{$sym} = sub {
-			my $self = shift;
-			$cache_opt{$pkg} ||= $self->file_cache_options;
-			$cf_obj{$pkg} ||=
-				new Class::FileCacheable::_CF($cache_opt{$pkg});
-			my $cache_id_seed =
-			$data->[0]->{default_key} || $cache_opt{$pkg}->{default_key} || '';
-			my $cache_id = *{$sym}. "\t". $cache_id_seed;
-			if ($cache_opt{$pkg}->{number_cache_id}) {
-				$cache_id .= "\t" . ($fnames{*{$sym}}++);
-			}
-			
-			my $output;
-			my $cache_tp = $cf_obj{$pkg}->get_cache_timestamp($cache_id);
-			
-			### check expire
-			if (defined $cache_tp) {
-				if ($data->[0]->{expire_ref}) {
-					if (! $data->[0]->{expire_ref}->($cache_tp)) {
-						$output = $cf_obj{$pkg}->get($cache_id);
-					}
-				} elsif (! $self->file_cache_expire($cache_tp)) {
-					$output = $cf_obj{$pkg}->get($cache_id);
-				}
-			}
-			
-			### generate cache
-			if (! defined($output)) {
-				no strict 'refs';
-				$output = $self->$ref(@_);
-				$cf_obj{$pkg}->set($cache_id, $output);
-			}
-			
-			return $output;
-		}
-	}
-	
-	DESTROY {
-		shift->file_cache_purge();
-	}
-	
-	sub file_cache_purge {
-		
-	}
+our $VERSION = '0.03';
+    
+    my %fnames;
+    my %cf_obj;
+    
+    ### ---
+    ### return true if cache *EXPIRED*
+    ### ---
+    sub file_cache_expire {
+        return 0;
+    }
+    
+    ### ---
+    ### Define FileCacheable attribute
+    ### ---
+    sub FileCacheable : ATTR(CHECK) {
+        
+        my($pkg, $sym, $ref, undef, $data, undef) = @_;
+        
+        no warnings 'redefine';
+        
+        *{$sym} = sub {
+            my $self = shift;
+            my $opt = $self->file_cache_options;
+            $cf_obj{$pkg} ||= new Class::FileCacheable::_CF($opt);
+            my $cache_id_seed = $data->[0]->{default_key} || $opt->{default_key};
+            my $cache_id = *{$sym}. "\t". ($cache_id_seed || '');
+            if ($opt->{number_cache_id}) {
+                $cache_id .= "\t" . ($fnames{*{$sym}}++);
+            }
+            
+            my $output;
+            my $cache_tp = $cf_obj{$pkg}->get_cache_timestamp($cache_id);
+            
+            ### check expire
+            if (defined $cache_tp) {
+                if ($data->[0]->{expire_ref}) {
+                    if (! $data->[0]->{expire_ref}->($cache_tp)) {
+                        $output = $cf_obj{$pkg}->get($cache_id);
+                    }
+                } elsif (! $self->file_cache_expire($cache_tp)) {
+                    $output = $cf_obj{$pkg}->get($cache_id);
+                }
+            }
+            
+            ### generate cache
+            if (! defined($output)) {
+                no strict 'refs';
+                $output = $self->$ref(@_);
+                $cf_obj{$pkg}->set($cache_id, $output);
+            }
+            
+            return $output;
+        }
+    }
+    
+    DESTROY {
+        shift->file_cache_purge();
+    }
+    
+    sub file_cache_purge {
+        
+    }
 
 package Class::FileCacheable::_CF;
 use strict;
 use warnings;
 use Data::Dumper;
 use base qw(Cache::FileCache);
-	
-	sub get_cache_timestamp {
-		
-		my ($self, $id) = @_;
-		return
-			(stat $self->{_Backend}->_path_to_key($self->{_Namespace}, $id))[9];
-	}
+    
+    sub get_cache_timestamp {
+        
+        my ($self, $id) = @_;
+        return
+            (stat $self->{_Backend}->_path_to_key($self->{_Namespace}, $id))[9];
+    }
 
 1;
 
@@ -96,31 +92,31 @@ Class::FileCacheable - DEVELOPING
 =head1 SYNOPSIS
 
     use base 'Class::FileCacheable';
-	
-	sub file_cache_expire {
-		my ($self, $timestamp) = @_;
-		if (some_condifion) {
-			return 1;
-		}
-	}
-	
-	sub file_cache_options {
-		return {
-			'namespace' => 'MyNamespace',
-			'cache_root' => 't/cache',
-			#...
-		};
-	}
-	
-	sub some_sub1 : FileCacheable {
-		
-		my $self = shift;
-	}
-	
-	sub some_sub2 : FileCacheable(\&expire_code_ref) {
-		
-		my $self = shift;
-	}
+    
+    sub file_cache_expire {
+        my ($self, $timestamp) = @_;
+        if (some_condifion) {
+            return 1;
+        }
+    }
+    
+    sub file_cache_options {
+        return {
+            'namespace' => 'MyNamespace',
+            'cache_root' => 't/cache',
+            #...
+        };
+    }
+    
+    sub some_sub1 : FileCacheable {
+        
+        my $self = shift;
+    }
+    
+    sub some_sub2 : FileCacheable(\&expire_code_ref) {
+        
+        my $self = shift;
+    }
 
 =head1 DESCRIPTION
 
@@ -137,10 +133,10 @@ To use this, do following steps.
 
 =item define your subs as follows
 
-	sub your_sub : FileCacheable {
-		my $self = shift;
-		# do something
-	}
+    sub your_sub : FileCacheable {
+        my $self = shift;
+        # do something
+    }
 
 That's it.
 
@@ -154,12 +150,12 @@ Your module can override the method if necessary.
 file_cache_exipre will be called as instance method when the target method
 called. This method takes timestamp of the cache as argument.
 
-	sub file_cache_expire {
-		my ($self, $timestamp) = @_;
-		if (some_condifion) {
-			return 1;
-		}
-	}
+    sub file_cache_expire {
+        my ($self, $timestamp) = @_;
+        if (some_condifion) {
+            return 1;
+        }
+    }
 
 file_cache_exipre should return 1 or 0. 1 causes the cache *EXPIRED*
 
@@ -194,14 +190,15 @@ Not implemented yet
     use warnings;
     use base 'Class::FileCacheable';
     use LWP::Simple;
-    
+        
         sub new {
-            return bless {}, shift;
+            my ($class, $url) = @_;
+            return bless {url => $url}, $class;
         }
         
-        sub get : FileCacheable {
+        sub get_url : FileCacheable {
             my $self = shift;
-            return get("http://example.com/");
+            return LWP::Simple::get($self->{url});
         }
     
         sub file_cache_expire {
@@ -212,9 +209,11 @@ Not implemented yet
         }
         
         sub file_cache_options {
+            my $self = shift;
             return {
-                'namespace' => 'GetRemoteFile',
-                'cache_root' => './cache',
+                namespace => 'Test',
+                cache_root => 't/cache',
+                default_key => $self->{url},
             };
         }
 

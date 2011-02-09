@@ -5,31 +5,31 @@ Class::FileCacheable - DEVELOPING
 =head1 SYNOPSIS
 
     use base 'Class::FileCacheable';
-	
-	sub file_cache_expire {
-		my ($self, $timestamp) = @_;
-		if (some_condifion) {
-			return 1;
-		}
-	}
-	
-	sub file_cache_options {
-		return {
-			'namespace' => 'MyNamespace',
-			'cache_root' => 't/cache',
-			#...
-		};
-	}
-	
-	sub some_sub1 : FileCacheable {
-		
-		my $self = shift;
-	}
-	
-	sub some_sub2 : FileCacheable(\&expire_code_ref) {
-		
-		my $self = shift;
-	}
+    
+    sub file_cache_expire {
+        my ($self, $timestamp) = @_;
+        if (some_condifion) {
+            return 1;
+        }
+    }
+    
+    sub file_cache_options {
+        return {
+            'namespace' => 'MyNamespace',
+            'cache_root' => 't/cache',
+            #...
+        };
+    }
+    
+    sub some_sub1 : FileCacheable {
+        
+        my $self = shift;
+    }
+    
+    sub some_sub2 : FileCacheable(\&expire_code_ref) {
+        
+        my $self = shift;
+    }
 
 =head1 DESCRIPTION
 
@@ -46,10 +46,10 @@ To use this, do following steps.
 
 =item define your subs as follows
 
-	sub your_sub : FileCacheable {
-		my $self = shift;
-		# do something
-	}
+    sub your_sub : FileCacheable {
+        my $self = shift;
+        # do something
+    }
 
 That's it.
 
@@ -63,12 +63,12 @@ Your module can override the method if necessary.
 file_cache_exipre will be called as instance method when the target method
 called. This method takes timestamp of the cache as argument.
 
-	sub file_cache_expire {
-		my ($self, $timestamp) = @_;
-		if (some_condifion) {
-			return 1;
-		}
-	}
+    sub file_cache_expire {
+        my ($self, $timestamp) = @_;
+        if (some_condifion) {
+            return 1;
+        }
+    }
 
 file_cache_exipre should return 1 or 0. 1 causes the cache *EXPIRED*
 
@@ -103,14 +103,15 @@ Not implemented yet
     use warnings;
     use base 'Class::FileCacheable';
     use LWP::Simple;
-    
+        
         sub new {
-            return bless {}, shift;
+            my ($class, $url) = @_;
+            return bless {url => $url}, $class;
         }
         
-        sub get : FileCacheable {
+        sub get_url : FileCacheable {
             my $self = shift;
-            return get("http://example.com/");
+            return LWP::Simple::get($self->{url});
         }
     
         sub file_cache_expire {
@@ -121,9 +122,11 @@ Not implemented yet
         }
         
         sub file_cache_options {
+            my $self = shift;
             return {
-                'namespace' => 'GetRemoteFile',
-                'cache_root' => './cache',
+                namespace => 'Test',
+                cache_root => 't/cache',
+                default_key => $self->{url},
             };
         }
 

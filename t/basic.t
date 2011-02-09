@@ -9,37 +9,12 @@ use TestModule2;
 use TestModule3;
 use TestModule4;
 use TestModule5;
+use TestModule6;
 use File::Path;
     
     my $cache_namespace_base = 't/cache/Test';
     
     __PACKAGE__->runtests;
-    
-=unsupported
-    
-    sub basic1 : Test(2) {
-        
-        if (-d $cache_namespace_base) {
-            rmtree($cache_namespace_base);
-        }
-        is(TestModule::sub1('test'), 'test'); # must be cached
-        is(TestModule::sub1('test2'), 'test');
-    }
-    
-    sub basic2 : Test(3) {
-        
-        if (-d $cache_namespace_base) {
-            rmtree($cache_namespace_base);
-        }
-        is(TestModule2::sub1('test'), 'test'); # must be cached
-        is(TestModule2::sub1('test2'), 'test2'); # must be cached
-        
-        if (-d $cache_namespace_base) {
-            rmtree($cache_namespace_base);
-        }
-        is(TestModule2::sub1('test2'), 'test2');
-    }
-=cut
     
     sub oop_basic : Test(10) {
         
@@ -86,7 +61,7 @@ use File::Path;
         isnt(TestModule4->get_debug_timestamp, undef);
     }
     
-    sub specify_expire_ref : Test(3) {
+    sub specify_expire_ref : Test(2) {
         
         if (-d $cache_namespace_base) {
             rmtree($cache_namespace_base);
