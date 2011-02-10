@@ -125,6 +125,8 @@ cacheable. This module depends on L<Cache::FileCache> for managing cache files.
 
 To use this, do following steps.
 
+=over
+
 =item use base 'Class::FileCacheable';
 
 =item override the method I<file_cache_expire>
@@ -137,6 +139,8 @@ To use this, do following steps.
         my $self = shift;
         # do something
     }
+
+=back
 
 That's it.
 
@@ -173,7 +177,11 @@ module can override the method if necessary.
 
 In addition to L<Cache::FileCache> options, you can set extra options bellow
 
+=over
+
 =item number_cache_id
+
+=back
 
 This takes 1 or 0 for value. '1' causes the cache ids automatically numbered so
 the caches doesn't affect in single process. This is useful if you want to
