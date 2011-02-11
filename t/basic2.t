@@ -21,19 +21,21 @@ use File::Path;
         if (-d $cache_namespace_base) {
             rmtree($cache_namespace_base);
         }
-        
-        my $a = TestModule6->new('http://example.com/');
-        is($a->get_lwp_count, 0);
-        $a->get_url;
-        is($a->get_lwp_count, 1);
-        $a->get_url;
-        is($a->get_lwp_count, 1);
-        
-        my $a = TestModule6->new('http://example.com/2');
-        $a->get_url;
-        is($a->get_lwp_count, 2);
-        $a->get_url;
-        is($a->get_lwp_count, 2);
+        {
+            my $a = TestModule6->new('http://example.com/');
+            is($a->get_lwp_count, 0);
+            $a->get_url;
+            is($a->get_lwp_count, 1);
+            $a->get_url;
+            is($a->get_lwp_count, 1);
+        }
+        {
+            my $a = TestModule6->new('http://example.com/2');
+            $a->get_url;
+            is($a->get_lwp_count, 2);
+            $a->get_url;
+            is($a->get_lwp_count, 2);
+        }
     }
     
     END {

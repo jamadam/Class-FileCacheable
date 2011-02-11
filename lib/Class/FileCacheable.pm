@@ -36,7 +36,7 @@ our $VERSION = '0.03';
             }
             
             my $output;
-            my $cache_tp = $cf_obj{$pkg}->get_cache_timestamp($cache_id);
+            my $cache_tp = $cf_obj{$pkg}->_get_cache_timestamp($cache_id);
             
             ### check expire
             if (defined $cache_tp) {
@@ -67,6 +67,10 @@ our $VERSION = '0.03';
     sub file_cache_purge {
         
     }
+    
+    sub file_cache_options {
+        
+    }
 
 package Class::FileCacheable::_CF;
 use strict;
@@ -74,7 +78,7 @@ use warnings;
 use Data::Dumper;
 use base qw(Cache::FileCache);
     
-    sub get_cache_timestamp {
+    sub _get_cache_timestamp {
         
         my ($self, $id) = @_;
         return
