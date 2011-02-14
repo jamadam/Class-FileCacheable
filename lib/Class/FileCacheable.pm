@@ -29,7 +29,7 @@ our $VERSION = '0.03';
             my $self = shift;
             my $opt = $self->file_cache_options;
             $cf_obj{$pkg} ||= new Class::FileCacheable::_CF($opt);
-            my $cache_id_seed = $data->[0]->{default_key} || $opt->{default_key};
+            my $cache_id_seed = $data->[0]->{key} || $opt->{default_key};
             my $cache_id = *{$sym}. "\t". ($cache_id_seed || '');
             if ($opt->{number_cache_id}) {
                 $cache_id .= "\t" . ($fnames{*{$sym}}++);
@@ -40,8 +40,8 @@ our $VERSION = '0.03';
             
             ### check expire
             if (defined $cache_tp) {
-                if ($data->[0]->{expire_ref}) {
-                    if (! $data->[0]->{expire_ref}->($cache_tp)) {
+                if ($data->[0]->{expire}) {
+                    if (! $data->[0]->{expire}->($cache_tp)) {
                         $output = $cf_obj{$pkg}->get($cache_id);
                     }
                 } elsif (! $self->file_cache_expire($cache_tp)) {
@@ -117,7 +117,7 @@ Class::FileCacheable - DEVELOPING
         my $self = shift;
     }
     
-    sub some_sub2 : FileCacheable(\&expire_code_ref) {
+    sub some_sub2 : FileCacheable({key => $key, expire => \&expire_code_ref}) {
         
         my $self = shift;
     }
