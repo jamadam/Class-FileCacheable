@@ -4,11 +4,6 @@ use warnings;
 use lib 't/lib', 'lib';
 use Test::More;
 use base 'Test::Class';
-use TestModule;
-use TestModule2;
-use TestModule3;
-use TestModule4;
-use TestModule5;
 use TestModule6;
 use File::Path;
     
