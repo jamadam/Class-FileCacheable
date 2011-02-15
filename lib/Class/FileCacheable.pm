@@ -2,6 +2,7 @@ package Class::FileCacheable;
 use strict;
 use warnings;
 use Attribute::Handlers;
+use Cache::FileCache;
 use Data::Dumper;
 use 5.005;
 our $VERSION = '0.03';
@@ -28,7 +29,7 @@ our $VERSION = '0.03';
         *{$sym} = sub {
             my $self = shift;
             my $opt = $self->file_cache_options;
-            $cf_obj{$pkg} ||= new Class::FileCacheable::_CF($opt);
+            $cf_obj{$pkg} ||= new Cache::FileCache($opt);
             my $cache_id_seed = $data->[0]->{key} || $opt->{default_key};
             my $cache_id = *{$sym}. "\t". ($cache_id_seed || '');
             if ($opt->{number_cache_id}) {
@@ -36,7 +37,10 @@ our $VERSION = '0.03';
             }
             
             my $output;
-            my $cache_tp = $cf_obj{$pkg}->_get_cache_timestamp($cache_id);
+            my $cache_tp;
+            if (my $a = $cf_obj{$pkg}->get_object($cache_id)) {
+                $cache_tp = $a->get_created_at;
+            }
             
             ### check expire
             if (defined $cache_tp) {
@@ -70,19 +74,6 @@ our $VERSION = '0.03';
     
     sub file_cache_options {
         
-    }
-
-package Class::FileCacheable::_CF;
-use strict;
-use warnings;
-use Data::Dumper;
-use base qw(Cache::FileCache);
-    
-    sub _get_cache_timestamp {
-        
-        my ($self, $id) = @_;
-        return
-            (stat $self->{_Backend}->_path_to_key($self->{_Namespace}, $id))[9];
     }
 
 1;
