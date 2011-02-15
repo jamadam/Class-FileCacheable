@@ -37,19 +37,17 @@ our $VERSION = '0.03';
             }
             
             my $output;
-            my $cache_tp;
-            if (my $a = $cf_obj{$pkg}->get_object($cache_id)) {
-                $cache_tp = $a->get_created_at;
-            }
             
-            ### check expire
-            if (defined $cache_tp) {
-                if ($data->[0]->{expire}) {
-                    if (! $data->[0]->{expire}->($cache_tp)) {
+            ### check if cache has expired
+            if (my $a = $cf_obj{$pkg}->get_object($cache_id)) {
+                if (my $cache_tp = $a->get_created_at) {
+                    if ($data->[0]->{expire}) {
+                        if (! $data->[0]->{expire}->($cache_tp)) {
+                            $output = $cf_obj{$pkg}->get($cache_id);
+                        }
+                    } elsif (! $self->file_cache_expire($cache_tp)) {
                         $output = $cf_obj{$pkg}->get($cache_id);
                     }
-                } elsif (! $self->file_cache_expire($cache_tp)) {
-                    $output = $cf_obj{$pkg}->get($cache_id);
                 }
             }
             
